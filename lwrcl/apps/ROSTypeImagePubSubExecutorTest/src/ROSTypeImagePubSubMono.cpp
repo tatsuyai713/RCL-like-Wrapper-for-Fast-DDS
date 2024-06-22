@@ -8,6 +8,12 @@ ROSTypeImagePubSubMono::ROSTypeImagePubSubMono(uint16_t domain_number)
     
     gray_msg_ = std::make_shared<sensor_msgs::msg::Image>();
 }
+ROSTypeImagePubSubMono::ROSTypeImagePubSubMono(std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> participant)
+    : Node(participant), publish_topic_name_("default_topic"), subscribe_topic_name_("default_topic"), interval_ms_(1000) {
+    counter_ = 0;
+    
+    gray_msg_ = std::make_shared<sensor_msgs::msg::Image>();
+}
 
 ROSTypeImagePubSubMono::~ROSTypeImagePubSubMono() {
 }

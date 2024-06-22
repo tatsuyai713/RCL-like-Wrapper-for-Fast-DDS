@@ -335,8 +335,19 @@ namespace lwrcl
     participant_qos.transport().listen_socket_buffer_size = 4194304;
 
     auto participant_factory = eprosima::fastdds::dds::DomainParticipantFactory::get_instance();
-    participant_ = std::unique_ptr<eprosima::fastdds::dds::DomainParticipant, DomainParticipantDeleter>(
-        participant_factory->create_participant(domain_id, participant_qos));
+    participant_ = std::shared_ptr<eprosima::fastdds::dds::DomainParticipant>(
+    eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->create_participant(domain_id, participant_qos),
+    DomainParticipantDeleter());
+    if (!participant_)
+    {
+      throw std::runtime_error("Failed to create domain participant");
+    }
+
+    global_registry.add_node(this);
+  }
+
+  Node::Node(std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> participant) : clock_(std::make_unique<Clock>()), participant_(participant)
+  {
     if (!participant_)
     {
       throw std::runtime_error("Failed to create domain participant");
@@ -350,6 +361,11 @@ namespace lwrcl
     publisher_list_.clear();
     subscription_list_.clear();
     timer_list_.clear();
+  }
+
+  std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> Node::get_participant() const
+  {
+    return participant_;
   }
 
   void Node::spin()

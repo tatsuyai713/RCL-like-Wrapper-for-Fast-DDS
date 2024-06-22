@@ -43,7 +43,7 @@ int main(int argc, char **argv)
         std::cerr << "Failed to initialize the ROSTypeImagePubSubMono." << std::endl;
         return 1;
     }
-    ROSTypeImagePubSubMono rcl_like_node2(0);
+    ROSTypeImagePubSubMono rcl_like_node2(rcl_like_node1.get_participant());
     configPath2 = configPath + "config/config2.yaml"; // Append the relative path of the config file
     std::cout << "Using config file at: " << configPath2 << std::endl;
     

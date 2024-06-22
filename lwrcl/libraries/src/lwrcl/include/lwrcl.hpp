@@ -30,7 +30,9 @@ namespace lwrcl
   {
   public:
     Node(int domain_id);
+    Node(std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> participant);
     virtual ~Node();
+    std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> get_participant() const;
 
     template <typename T>
     Publisher<T> *create_publisher(MessageType *message_type, const std::string &topic, const dds::TopicQos &qos)
@@ -77,7 +79,7 @@ namespace lwrcl
         }
     };
 
-    std::unique_ptr<eprosima::fastdds::dds::DomainParticipant, DomainParticipantDeleter> participant_;
+    std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> participant_;
     std::forward_list<std::unique_ptr<IPublisher>> publisher_list_;
     std::forward_list<std::unique_ptr<ISubscriber>> subscription_list_;
     std::forward_list<std::unique_ptr<ITimer>> timer_list_;
