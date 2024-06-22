@@ -178,7 +178,7 @@ void TransformStampedSubscriber::run()
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "child";
