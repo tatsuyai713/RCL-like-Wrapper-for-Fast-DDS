@@ -35,7 +35,7 @@
 #include <string>
 #include <vector>
 
-#include "std_msgs/msg/Time.h"
+#include "builtin_interfaces/msg/Time.h"
 #include "geometry_msgs/msg/TransformStamped.h"
 
 #include "tf2/buffer_core.h"
@@ -56,7 +56,7 @@ TEST(tf2, setTransformValid)
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "child";
@@ -101,7 +101,7 @@ TEST(tf2, setTransformValidWithCallback)
 
   geometry_msgs::msg::TransformStamped transform_msg;
   transform_msg.header().frame_id() = target_frame;
-  transform_msg.header().stamp() = std_msgs::msg::Time();
+  transform_msg.header().stamp() = builtin_interfaces::msg::Time();
   transform_msg.header().stamp().sec() = 1;
   transform_msg.header().stamp().nanosec() = 0;
   transform_msg.child_frame_id() = source_frame;
@@ -120,7 +120,7 @@ TEST(tf2, setTransformInvalidQuaternion)
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "child";
@@ -149,7 +149,7 @@ TEST(tf2_lookupTransform, LookupException_One_Exists)
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "child";
@@ -167,7 +167,7 @@ TEST(tf2_canTransform, One_Exists)
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "child";
@@ -181,7 +181,7 @@ TEST(tf2_clear, LookUp_Static_Transfrom_Succeed)
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "bar";
@@ -198,7 +198,7 @@ TEST(tf2_clear, LookUp_Static_Transfrom_Fail)
   tf2::BufferCore tfc;
   geometry_msgs::msg::TransformStamped st;
   st.header().frame_id() = "foo";
-  st.header().stamp() = std_msgs::msg::Time();
+  st.header().stamp() = builtin_interfaces::msg::Time();
   st.header().stamp().sec() = 1;
   st.header().stamp().nanosec() = 0;
   st.child_frame_id() = "bar";

@@ -42,7 +42,7 @@ TransformStampedPublisher::TransformStampedPublisher()
 bool TransformStampedPublisher::init(
         bool use_env)
 {
-    std_msgs::msg::Time stamp;
+    builtin_interfaces::msg::Time stamp;
     stamp.nanosec(0);
     stamp.sec(0);
     hello_.header().stamp(stamp);
