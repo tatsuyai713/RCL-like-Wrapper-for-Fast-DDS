@@ -11,6 +11,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
+
 using namespace lwrcl;
 
 #ifndef SENSOR_MSGS_MSG_IMAGETYPE_HPP
@@ -18,7 +19,6 @@ using namespace lwrcl;
 FAST_DDS_DATA_TYPE(sensor_msgs, msg, Image)
 #endif // SENSOR_MSGS_MSG_IMAGETYPE_HPP
 
-using namespace lwrcl;
 class ROSTypeImagePubSubMono : public Node {
 public:
     ROSTypeImagePubSubMono(uint16_t domain_number);

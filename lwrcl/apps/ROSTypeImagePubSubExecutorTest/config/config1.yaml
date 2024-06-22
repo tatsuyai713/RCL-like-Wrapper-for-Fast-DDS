@@ -1,0 +1,7 @@
+config:
+  publish_topics:
+    - name: "mono_out1"
+      interval_ms: 100
+  subscribe_topics:
+    - name: "video_frames"
+      interval_ms: 100
