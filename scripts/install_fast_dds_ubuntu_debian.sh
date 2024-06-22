@@ -8,7 +8,7 @@ fast_dds_gen_version="3.3.0"
 FAST_DDS_WORK_DIR=./dds_build
 
 sudo apt update
-sudo apt install -y gcc g++ make cmake automake autoconf unzip git vim openssl gcc make cmake curl tar default-jre default-jdk wget p11-kit
+sudo apt install -y gcc g++ make cmake automake autoconf unzip git vim openssl gcc make cmake curl tar wget p11-kit
 
 p11-kit list-modules
 
