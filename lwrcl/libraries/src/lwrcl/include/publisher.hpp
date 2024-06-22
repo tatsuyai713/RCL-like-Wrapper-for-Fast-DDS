@@ -37,11 +37,21 @@ namespace lwrcl
       {
         throw std::runtime_error("Failed to register message type");
       }
-      topic_ = participant_->create_topic(topic, message_type_->get_type_support().get_type_name(), qos);
-      if (!topic_)
+
+      dds::Topic* retrieved_topic = dynamic_cast<eprosima::fastdds::dds::Topic*>(participant->lookup_topicdescription(topic));
+      if (retrieved_topic == nullptr)
       {
-        throw std::runtime_error("Failed to create topic");
+        topic_ = participant_->create_topic(topic, message_type_->get_type_support().get_type_name(), qos);
+        if (!topic_)
+        {
+          throw std::runtime_error("Failed to create topic");
+        }
       }
+      else
+      {
+        topic_ = retrieved_topic;
+      }
+
       publisher_ = participant_->create_publisher(dds::PUBLISHER_QOS_DEFAULT);
       if (!publisher_)
       {
