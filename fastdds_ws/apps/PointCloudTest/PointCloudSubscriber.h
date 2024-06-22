@@ -19,7 +19,7 @@
 
 #ifndef HELLOWORLDSUBSCRIBER_H_
 #define HELLOWORLDSUBSCRIBER_H_
-
+#include <thread>
 #include "sensor_msgs/msg/PointCloud2.h"
 #include "sensor_msgs/msg/PointCloud2PubSubTypes.h"
 
