@@ -334,7 +334,11 @@ namespace lwrcl
     // Increase the receiving buffer size
     participant_qos.transport().listen_socket_buffer_size = 4194304;
 
+    // eprosima::fastdds::dds::Log::SetVerbosity(eprosima::fastdds::dds::Log::Info);
+
     auto participant_factory = eprosima::fastdds::dds::DomainParticipantFactory::get_instance();
+    participant_factory->load_XML_profiles_file("/opt/fast-dds/fastdds.xml");
+
     participant_ = std::shared_ptr<eprosima::fastdds::dds::DomainParticipant>(
     eprosima::fastdds::dds::DomainParticipantFactory::get_instance()->create_participant(domain_id, participant_qos),
     DomainParticipantDeleter());

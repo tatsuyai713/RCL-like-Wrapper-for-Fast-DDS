@@ -22,6 +22,7 @@ FAST_DDS_DATA_TYPE(sensor_msgs, msg, Image)
 class ROSTypeImagePubSubEdge : public Node {
 public:
     ROSTypeImagePubSubEdge(uint16_t domain_number);
+    ROSTypeImagePubSubEdge(std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> participant);
     virtual ~ROSTypeImagePubSubEdge();
 
     // Override init and run methods from Node

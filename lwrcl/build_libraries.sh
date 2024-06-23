@@ -38,7 +38,8 @@ make -j4
 
 if [ ! $OPT_NUM -ne 1 ]; then
 	if [ "install" = $OPT ]; then
-                sudo make install
+    sudo make install
+    sudo cp ../src/lwrcl/fastdds.xml $DDS_PATH/
 	fi
 
 fi

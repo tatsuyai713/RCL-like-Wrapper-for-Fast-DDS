@@ -1,0 +1,47 @@
+<dds>
+    <profiles xmlns="http://www.eprosima.com">
+        <transport_descriptors>
+            <transport_descriptor>
+                <transport_id>shm_transport</transport_id>
+                <type>SHM</type>
+                <default_reception_threads>
+                    <scheduling_policy>-1</scheduling_policy>
+                    <priority>0</priority>
+                    <affinity>0</affinity>
+                    <stack_size>-1</stack_size>
+                </default_reception_threads>
+                <reception_threads>
+                    <reception_thread port="12345">
+                        <scheduling_policy>-1</scheduling_policy>
+                        <priority>0</priority>
+                        <affinity>0</affinity>
+                        <stack_size>-1</stack_size>
+                    </reception_thread>
+                </reception_threads>
+                <dump_thread>
+                    <scheduling_policy>-1</scheduling_policy>
+                    <priority>0</priority>
+                    <affinity>0</affinity>
+                    <stack_size>-1</stack_size>
+                </dump_thread>
+            </transport_descriptor>
+        </transport_descriptors>
+
+        <participant profile_name="SHMParticipant">
+            <rtps>
+                <useBuiltinTransports>true</useBuiltinTransports>
+                <userTransports>
+                    <transport_id>shm_transport</transport_id>
+                </userTransports>
+            </rtps>
+        </participant>
+
+        <participant profile_name="participant_profile">
+            <rtps>
+                <userTransports>
+                    <transport_id>shm_transport</transport_id>
+                </userTransports>
+            </rtps>
+        </participant>
+    </profiles>
+</dds>

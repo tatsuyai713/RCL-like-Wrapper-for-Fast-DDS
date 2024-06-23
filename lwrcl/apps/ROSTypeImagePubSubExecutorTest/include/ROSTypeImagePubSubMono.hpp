@@ -11,7 +11,6 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
-
 using namespace lwrcl;
 
 #ifndef SENSOR_MSGS_MSG_IMAGETYPE_HPP
