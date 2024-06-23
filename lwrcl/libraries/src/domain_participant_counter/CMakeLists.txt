@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16.3)
-project(libraries)
+project(domain_participant_counter)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -39,7 +39,13 @@ else()
     link_directories(/opt/fast-dds-libs/lib)
 endif()
 
-add_subdirectory(src/lwrcl)
-add_subdirectory(src/tf2)
-add_subdirectory(src/tf2_ros)
-add_subdirectory(src/domain_participant_counter)
+add_executable(${PROJECT_NAME} src/${PROJECT_NAME}.cpp)
+target_include_directories(${PROJECT_NAME} PUBLIC include ${ROS_DATA_TYPES_INCLUDE_PATH})
+
+target_link_libraries(${PROJECT_NAME} fastrtps)
+
+# Install targets
+install(TARGETS ${PROJECT_NAME}
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
