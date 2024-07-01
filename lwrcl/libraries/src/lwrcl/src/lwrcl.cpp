@@ -6,12 +6,16 @@
 #include <mutex>
 #include <algorithm>
 #include <functional>
+#include <memory>
+#include <chrono>
+#include <vector>
 #include "lwrcl.hpp" // The main header file for the lwrcl namespace
 
 namespace lwrcl
 {
   class Node;
 }
+
 class HandlerRegistry
 {
 public:
@@ -35,12 +39,23 @@ public:
     std::lock_guard<std::mutex> lock(registry_mutex);
     for (auto *node : nodes_)
     {
-      node->stop_spin();
+      if (node)
+      {
+        node->stop_spin();
+      }
+      else
+      {
+        std::cerr << "node pointer is invalid!" << std::endl;
+      }
     }
   }
 };
 
-static HandlerRegistry global_registry;
+static HandlerRegistry &get_global_registry()
+{
+  static HandlerRegistry global_registry;
+  return global_registry;
+}
 
 // Global flag to control the stopping of the application, e.g., in response to SIGINT
 std::atomic_bool global_stop_flag{false};
@@ -51,32 +66,26 @@ void lwrcl_signal_handler(int signal)
   if (signal == SIGINT || signal == SIGTERM)
   {
     global_stop_flag = true;
-    global_registry.notify_all();
+    get_global_registry().notify_all();
   }
 }
 
 // Begin namespace for the lwrcl functionality
 namespace lwrcl
 {
+  SingleThreadedExecutor::SingleThreadedExecutor() {}
 
-  // Constructor for SingleThreadedExecutor to manage node execution
-  SingleThreadedExecutor::SingleThreadedExecutor()
-  {
-  }
-
-  // Destructor to ensure all nodes are properly stopped and resources are released
   SingleThreadedExecutor::~SingleThreadedExecutor()
   {
     stop_spin();
   }
 
-  // Adds a node to the executor for management and execution
   void SingleThreadedExecutor::add_node(Node *node)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if (node != nullptr)
     {
-      nodes_.push_back(node); // Valid node pointers are added to the list
+      nodes_.push_back(node);
     }
     else
     {
@@ -84,17 +93,15 @@ namespace lwrcl
     }
   }
 
-  // Removes a node from the executor's management
   void SingleThreadedExecutor::remove_node(Node *node)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if (node != nullptr)
     {
-      nodes_.erase(std::remove(nodes_.begin(), nodes_.end(), node), nodes_.end()); // Removes the specified node
+      nodes_.erase(std::remove(nodes_.begin(), nodes_.end(), node), nodes_.end());
     }
   }
 
-  // Stops all nodes managed by the executor
   void SingleThreadedExecutor::stop_spin()
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -102,7 +109,7 @@ namespace lwrcl
     {
       if (node)
       {
-        node->stop_spin(); // Stops spinning for each node
+        node->stop_spin();
       }
       else
       {
@@ -111,13 +118,12 @@ namespace lwrcl
     }
   }
 
-  // Starts execution of all nodes managed by the executor
   void SingleThreadedExecutor::spin()
   {
-    while (!global_stop_flag.load()) // Checks for global stop flag
+    while (!global_stop_flag.load())
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      for (auto node : nodes_) // Executes spin_some for each managed node
+      for (auto node : nodes_)
       {
         if (node)
         {
@@ -128,14 +134,14 @@ namespace lwrcl
           std::cerr << "node pointer is invalid!" << std::endl;
         }
       }
-      std::this_thread::sleep_for(std::chrono::microseconds(10)); // Reduces CPU usage
+      std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
   }
 
   void SingleThreadedExecutor::spin_some()
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    for (auto node : nodes_) // Executes spin_some for each managed node
+    for (auto node : nodes_)
     {
       if (node)
       {
@@ -154,83 +160,82 @@ namespace lwrcl
     stop_spin();
   }
 
-  // Constructor: Initializes the executor with running state set to false and registers the signal handler.
-  MultiThreadedExecutor::MultiThreadedExecutor()
-  {
-  }
+  MultiThreadedExecutor::MultiThreadedExecutor() {}
 
-  // Destructor: Ensures all managed threads are properly joined before destruction to avoid dangling threads.
   MultiThreadedExecutor::~MultiThreadedExecutor()
   {
-    stop_spin(); // Stop all threads and ensure they are joined before object destruction.
+    stop_spin();
   }
 
-  // Adds a new node to the executor for management. Validates the node pointer before adding.
   void MultiThreadedExecutor::add_node(Node *node)
   {
-    std::lock_guard<std::mutex> lock(mutex_); // Lock for thread-safe access to nodes_ vector.
+    std::lock_guard<std::mutex> lock(mutex_);
     if (node != nullptr)
     {
-      nodes_.push_back(node); // Valid node pointers are added to the list for execution.
+      nodes_.push_back(node);
     }
     else
     {
-      std::cerr << "Error: Node pointer is null, cannot add to executor." << std::endl; // Error handling for null pointers.
+      std::cerr << "Error: Node pointer is null, cannot add to executor." << std::endl;
     }
   }
 
-  // Removes a node from the executor's management, ensuring it no longer receives execution time.
   void MultiThreadedExecutor::remove_node(Node *node)
   {
-    std::lock_guard<std::mutex> lock(mutex_); // Lock for thread-safe modification of nodes_ vector.
+    std::lock_guard<std::mutex> lock(mutex_);
     if (node != nullptr)
     {
-      nodes_.erase(std::remove(nodes_.begin(), nodes_.end(), node), nodes_.end()); // Erase the specified node from the vector.
+      nodes_.erase(std::remove(nodes_.begin(), nodes_.end(), node), nodes_.end());
     }
   }
 
-  // Signals all threads to stop and waits for them to finish, ensuring a clean shutdown.
   void MultiThreadedExecutor::stop_spin()
   {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto node : nodes_)
     {
-      node->stop_spin();
+      if (node)
+      {
+        node->stop_spin();
+      }
+      else
+      {
+        std::cerr << "node pointer is invalid!" << std::endl;
+      }
     }
 
     for (auto &thread : threads_)
     {
       if (thread.joinable())
       {
-        thread.join(); // Wait for thread to finish its execution.
+        thread.join();
       }
     }
-    threads_.clear(); // Clear the list of threads once all have been joined.
+    threads_.clear();
   }
 
-  // Starts the execution of all nodes in separate threads, allowing for parallel processing.
   void MultiThreadedExecutor::spin()
   {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto node : nodes_)
     {
-      threads_.emplace_back([this, node]() { // Create a new thread for each node.
+      threads_.emplace_back([this, node]()
+                            {
         if (!node)
         {
-          std::cerr << "node pointer is invalid!" << std::endl; // Error handling for invalid node pointers.
+          std::cerr << "node pointer is invalid!" << std::endl;
         }
         else
         {
-          node->spin(); // Execute node-specific spinning logic.
-        }
-      });
+          node->spin();
+        } });
     }
 
     for (auto &thread : threads_)
     {
       if (thread.joinable())
       {
-        thread.join(); // Ensure all threads are finished before exiting spin method.
+        thread.join();
       }
     }
   }
@@ -238,7 +243,7 @@ namespace lwrcl
   void MultiThreadedExecutor::spin_some()
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    for (auto node : nodes_) // Executes spin_some for each managed node
+    for (auto node : nodes_)
     {
       if (node)
       {
@@ -347,7 +352,7 @@ namespace lwrcl
       throw std::runtime_error("Failed to create domain participant");
     }
 
-    global_registry.add_node(this);
+    get_global_registry().add_node(this);
   }
 
   Node::Node(std::shared_ptr<eprosima::fastdds::dds::DomainParticipant> participant) : clock_(std::make_unique<Clock>()), participant_(participant)
@@ -357,7 +362,7 @@ namespace lwrcl
       throw std::runtime_error("Failed to create domain participant");
     }
 
-    global_registry.add_node(this);
+    get_global_registry().add_node(this);
   }
 
   Node::~Node()
